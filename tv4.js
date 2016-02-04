@@ -727,7 +727,7 @@ ValidatorContext.prototype.validateBasic = function validateBasic(data, schema, 
 	return null;
 };
 
-ValidatorContext.prototype.validateType = function validateType(data, schema) {
+ValidatorContext.prototype.validateType = function validateType(data, schema, dataPointerPath) {
 	if (schema.type === undefined) {
 		return null;
 	}
@@ -748,10 +748,10 @@ ValidatorContext.prototype.validateType = function validateType(data, schema) {
 			return null;
 		}
 	}
-	return this.createError(ErrorCodes.INVALID_TYPE, {type: dataType, expected: allowedTypes.join("/")}, '', '', null, data, schema);
+	return this.createError(ErrorCodes.INVALID_TYPE, {type: dataType, expected: allowedTypes.join("/")}, dataPointerPath, '', null, data, schema);
 };
 
-ValidatorContext.prototype.validateEnum = function validateEnum(data, schema) {
+ValidatorContext.prototype.validateEnum = function validateEnum(data, schema, dataPointerPath) {
 	if (schema["enum"] === undefined) {
 		return null;
 	}
@@ -1358,6 +1358,11 @@ function defaultErrorReporter(language) {
 		if (typeof messageTemplate !== 'string') {
 			return "Unknown error code " + error.code + ": " + JSON.stringify(error.messageParams);
 		}
+		
+		if (error.dataPath) {
+			messageTemplate += " for " + error.dataPath.slice(1).replace(/\//g, '.');
+		}
+
 		var messageParams = error.params;
 		// Adapted from Crockford's supplant()
 		return messageTemplate.replace(/\{([^{}]*)\}/g, function (whole, varName) {
