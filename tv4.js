@@ -744,7 +744,9 @@ ValidatorContext.prototype.validateType = function validateType(data, schema, da
 
 	for (var i = 0; i < allowedTypes.length; i++) {
 		var type = allowedTypes[i];
-		if (type === dataType || (type === "integer" && dataType === "number" && (data % 1 === 0))) {
+		if (type === dataType || 
+			(type === "integer" && dataType === "number" && (data % 1 === 0)) ||
+			(type === "enum" && dataType == "string")) {
 			return null;
 		}
 	}
@@ -761,7 +763,7 @@ ValidatorContext.prototype.validateEnum = function validateEnum(data, schema, da
 			return null;
 		}
 	}
-	return this.createError(ErrorCodes.ENUM_MISMATCH, {value: (typeof JSON !== 'undefined') ? JSON.stringify(data) : data}, '', '', null, data, schema);
+	return this.createError(ErrorCodes.ENUM_MISMATCH, {value: (typeof JSON !== 'undefined') ? JSON.stringify(data) : data}, dataPointerPath, '', null, data, schema);
 };
 
 ValidatorContext.prototype.validateNumeric = function validateNumeric(data, schema, dataPointerPath) {
